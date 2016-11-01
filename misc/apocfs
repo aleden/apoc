@@ -1,0 +1,12 @@
+// Files Directory (10k)
+
+struct File
+{
+  Character name[0x10];
+
+  UInt sectorOffset;
+  UInt sectorCount;
+} files[];
+
+// Files 
+UInt8 filesData[];

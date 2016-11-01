@@ -1,0 +1,35 @@
+Example Code to create a file with "Hello, file!" in it:
+
+InStream<Byte>* hardDiskInputStream = DiskIO::CreateInputStream();
+hardDiskInputStream->Seek(SectorsToBytes(200));
+FileSystem* hardDriveFileSystem = FileSystem::Open();
+FileSystem::File* helloFile = hardDriveFileSystem->OpenFile("/usr/aeden/home/hello", File::ACCESS_WRITE);
+OutStream<Byte>* helloFileOutputStream = helloFile->GetOutputStream();
+
+const Character* string = "Hello, file!";
+helloFileOutputStream->Write(string, CountString(string));
+
+Assumptions:
+* File system has "directories" and "files"
+
+Functionality requirements:
+* Get abstract Directory type
+ - Why? -> more efficient process to find files if we already directly have a pointer to a Directory containing enough information to identify it
+* Example of functionality: open("/usr/aeden/home/bitbucket.bin")
+
+Design options (need to support streams...)
+1. Polymorphism. Interface called "FileSystem" where specific file systems can inherit.
+ Pros: Convienence in code which should be able to use any type of fs
+ Cons: Goes against the design goals of Apoc?
+2. Namespaces for each specific file system which have functions for reading, writing
+ Pros: Speed? We could easily create a function table of pointers to functions for reading and writing based on the type (index) of the fs
+ Cons: Less convienence?
+ Example: InStream* Apoc::FileSystem::Open(DiskIndex, FILE_SYSTEM_TYPE)
+ {
+    static (Instream* (DiskIndex))* fsOpens[] = 
+    {
+      FileSystem::Apoc::Open,
+      FileSystem::EXT4::Open
+    
+ }
+3. Templates. FileSystems fulfill the requirements of an imaginary template "interface" for filesystems
